@@ -22,13 +22,18 @@ struct quizView: View {
         Question(question: "How many countries in the U.K.?", options: ["1", "2", "3", "4"], answer: "4"),
         Question(question: "Which country is known as the Land of Rising Sun?", options: ["Japan", "France", "China", "Korea"], answer: "Japan"),
         Question(question: "What is the largest continent in the world?", options: ["Europe", "Asia", "Africa", "North America"], answer: "Asia"),
-        Question(question: "Who painted the famous artwork The Last Supper?", options: ["Pablo Picasso", "Leonado da Vinci", "Michelangelo", "Vincent van Gogh"], answer: "Leonardo da Vinci"),
+        Question(question: "Who painted the famous artwork The Last Supper?", options: ["Pablo Picasso", "Leonardo da Vinci", "Michelangelo", "Vincent van Gogh"], answer: "Leonardo da Vinci"),
         Question(question: "What company was initially known as Blue Ribbon Sports?", options: ["Puma", "Nike", "Adidas", "Under Armour"], answer: "Nike"),
         Question(question: "How many bones do we have in an ear?", options: ["2", "4", "3", "5"], answer: "3"),
     ]
     @State var index : Int = 0
     @State var score: Int = 0
     @State var numQuestion : Int = 1
+    @State var numAnswerChosen : Int = 0
+    @State var correctAnswer : Bool = false
+    @State var shuffledOptions : [String] = []
+    @State var shuffle : Bool = true
+    @State var showNextBtn : Bool = false
     
     var body: some View {
         NavigationView{
@@ -40,30 +45,60 @@ struct quizView: View {
                 
                 
                 VStack{
+                    Text("Score: \(score)")
+                    
                     Text("Question \(numQuestion)")
                     
                     Text(questions[index].question)
                     
-                    ForEach(questions[index].options.shuffled(), id: \.self) { option in
+                    ForEach(shuffledOptions.indices, id: \.self) { option in
+                        let option = shuffledOptions[option] //assign option to options in the array
                         Button(action: {
-                            let selectedOption = option
                             manageAnswer(selectedOption: option)
+                            shuffle = false //stop shuffling after an option is clicked
+                            showNextBtn = true
                         }){
                             Text(option)
-                                .foregroundStyle(.white)
+                                .padding()
+                                .background(.white)
+                                .foregroundColor(.black)
                         }
+                        .background(option == questions[index].answer ? .green : .red)
+                        .disabled(numAnswerChosen == 1) //disable the button when an option is clicked
                     }
                     Spacer()
+                    
+                    if showNextBtn{
+                        Button(action: {
+                            index += 1
+                            numQuestion += 1
+                            numAnswerChosen = 0
+                            shuffledOptions = questions[index].options.shuffled()
+                        }){
+                            Text("Next")
+                                .background(.black)
+                        }
+                    }
                 }
             }
+
+        }
+        .onAppear{ //shuffle when a view appears
+            if shuffle{ //when shuffle true, shuffle the options
+                shuffledOptions = questions[index].options.shuffled() //assign shuffledOptions to options in the array but shuffled
+            }
+            shuffle = true //reset
         }
     }
     func manageAnswer(selectedOption : String){
-        if selectedOption == questions[index].answer{
-            print("HI")
+        if selectedOption == questions[index].answer{ //check if the answer chosen is correct
+            correctAnswer = true
+            numAnswerChosen += 1
+            score += 1
         }
         else{
-            print("False")
+            numAnswerChosen += 1
+            correctAnswer = false
         }
     }
 }
