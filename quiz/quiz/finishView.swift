@@ -8,11 +8,32 @@
 import SwiftUI
 
 struct finishView: View {
+    @State var score : Int //create variable to pass the score
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView{
+            ZStack {
+                Image("quizApp background")
+                    .resizable() //resize the img to fit its container
+                    .aspectRatio(contentMode: .fill)  //stretch the img to fill the available space
+                    .edgesIgnoringSafeArea(.all) //take all the edges of the screen and safe area
+                
+                VStack{
+                    Text("You finished 🎉")
+                        .font(.system(size: 50))
+                        .foregroundStyle(.white)
+                        .padding()
+                    
+                    Text("You got \(score) out of 10!")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.white)
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
-    finishView()
+    finishView(score: 0)
 }
